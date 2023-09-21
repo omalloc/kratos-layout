@@ -3,6 +3,7 @@ syntax = "proto3";
 package helloworld.v1;
 
 import "google/api/annotations.proto";
+import "protobuf/pagination.proto";
 
 option go_package = "github.com/go-kratos/kratos-layout/api/helloworld/v1;v1";
 option java_multiple_files = true;
@@ -17,6 +18,11 @@ service Greeter {
       get: "/helloworld/{name}"
     };
   }
+
+  // List all greetings by pagination
+  rpc List (HeelloListRequest) returns (HelloListReply) {
+    option (google.api.http).get = "/helloworld";
+  }
 }
 
 // The request message containing the user's name.
@@ -27,4 +33,21 @@ message HelloRequest {
 // The response message containing the greetings
 message HelloReply {
   string message = 1;
+}
+
+message GreeterInfo {
+  int64 id = 1;
+  string hello = 2;
+  int64 created_at = 3;
+  int64 updated_at = 4;
+}
+
+message HeelloListRequest {
+  protobuf.Pagination pagination = 1;
+  string name = 2;
+}
+
+message HelloListReply {
+  protobuf.Pagination pagination = 1;
+  repeated GreeterInfo data = 2;
 }

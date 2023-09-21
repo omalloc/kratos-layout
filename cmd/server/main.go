@@ -6,6 +6,7 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
 	"github.com/go-kratos/kratos/v2/config/file"
+	"github.com/go-kratos/kratos/v2/encoding/json"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/registry"
@@ -39,6 +40,10 @@ var (
 
 func init() {
 	maxprocs.Set(maxprocs.Logger(nil))
+	// use proto field defined names
+	// true  = UnderScoreCase
+	// false = CamelCase
+	json.MarshalOptions.UseProtoNames = true
 
 	rootCmd.PersistentFlags().StringVar(&flagconf, "conf", "../../configs", "config path")
 	rootCmd.PersistentFlags().BoolVarP(&flagverbose, "verbose", "v", false, "verbose output")

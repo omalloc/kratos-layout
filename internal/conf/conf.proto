@@ -10,8 +10,8 @@ import "protobuf/registry.proto";
 message Bootstrap {
   Server server = 1;
   Data data = 2;
-  omalloc.protobuf.Tracing tracing = 3;
-  omalloc.protobuf.Registry registry = 4;
+  protobuf.Tracing tracing = 3;
+  protobuf.Registry registry = 4;
 }
 
 message Server {

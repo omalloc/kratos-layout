@@ -3,10 +3,13 @@ package biz
 import (
 	"context"
 
-	v1 "github.com/omalloc/kratos-layout/api/helloworld/v1"
-
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/omalloc/contrib/kratos/orm"
+	"github.com/omalloc/contrib/kratos/orm/crud"
+	"github.com/omalloc/contrib/protobuf"
+
+	v1 "github.com/omalloc/kratos-layout/api/helloworld/v1"
 )
 
 var (
@@ -16,16 +19,17 @@ var (
 
 // Greeter is a Greeter model.
 type Greeter struct {
+	ID    int64 `gorm:"column:id;primaryKey;autoIncrement"`
 	Hello string
+
+	orm.DBModel
 }
 
 // GreeterRepo is a Greater repo.
 type GreeterRepo interface {
-	Save(context.Context, *Greeter) (*Greeter, error)
-	Update(context.Context, *Greeter) (*Greeter, error)
-	FindByID(context.Context, int64) (*Greeter, error)
-	ListByHello(context.Context, string) ([]*Greeter, error)
-	ListAll(context.Context) ([]*Greeter, error)
+	crud.CRUD[Greeter]
+
+	SelectBySomeField(ctx context.Context, field string) (*Greeter, error)
 }
 
 // GreeterUsecase is a Greeter usecase.
@@ -40,7 +44,11 @@ func NewGreeterUsecase(repo GreeterRepo, logger log.Logger) *GreeterUsecase {
 }
 
 // CreateGreeter creates a Greeter, and returns the new Greeter.
-func (uc *GreeterUsecase) CreateGreeter(ctx context.Context, g *Greeter) (*Greeter, error) {
+func (uc *GreeterUsecase) CreateGreeter(ctx context.Context, g *Greeter) error {
 	uc.log.WithContext(ctx).Infof("CreateGreeter: %v", g.Hello)
-	return uc.repo.Save(ctx, g)
+	return uc.repo.Create(ctx, g)
+}
+
+func (uc *GreeterUsecase) List(ctx context.Context, pagination *protobuf.Pagination, _ string) ([]*Greeter, error) {
+	return uc.repo.SelectList(ctx, pagination)
 }
