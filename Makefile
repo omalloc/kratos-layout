@@ -66,7 +66,7 @@ run:
 -X main.Name=$(APPNAME) \
 -X main.Built=$(Built) \
 " \
-		./cmd/... --conf ./configs/
+		./cmd/... --conf ./configs/ -v
 
 .PHONY: build
 # build

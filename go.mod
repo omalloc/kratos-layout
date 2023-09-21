@@ -6,7 +6,7 @@ require (
 	github.com/glebarez/sqlite v1.9.0
 	github.com/go-kratos/kratos/v2 v2.6.2
 	github.com/google/wire v0.5.0
-	github.com/omalloc/contrib v1.0.6-1
+	github.com/omalloc/contrib v1.0.7
 	github.com/samber/lo v1.38.1
 	github.com/spf13/cobra v1.7.0
 	go.uber.org/automaxprocs v1.5.1
