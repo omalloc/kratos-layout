@@ -1,8 +1,8 @@
 GOHOSTOS:=$(shell go env GOHOSTOS)
 GOPATH:=$(shell go env GOPATH)
-VERSION=$(shell git describe --tags --always --abbrev=8 | sed 's/[^a-zA-Z0-9]/-/g')
-GITHASH=$(shell git rev-parse HEAD)
-APPNAME=$(shell go list -m | awk -F/ '{print $$3}')
+VERSION:=$(shell git describe --tags --always --abbrev=8 | sed 's/[^a-zA-Z0-9]/-/g')
+GITHASH:=$(shell git rev-parse HEAD)
+APPNAME:=$(shell go mod edit -print | head -n1 | awk -F/ '{print $$3}')
 Built:=$(shell date +%s)
 
 ifeq ($(GOHOSTOS), windows)
@@ -30,7 +30,9 @@ init:
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 	go install github.com/go-kratos/kratos/cmd/kratos/v2@latest
 	go install github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2@latest
+	go install github.com/go-kratos/kratos/cmd/protoc-gen-go-errors/v2@latest
 	go install github.com/google/gnostic/cmd/protoc-gen-openapi@latest
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
 	go install github.com/google/wire/cmd/wire@latest
 
 .PHONY: config
@@ -45,16 +47,13 @@ config:
 .PHONY: api
 # generate api proto
 api:
-	mkdir -p ./api/docs && protoc --proto_path=./api \
+	protoc --proto_path=./api \
 		--proto_path=./third_party \
 		--proto_path=$(REMOTE_PROTO_FILES) \
 		--go_out=paths=source_relative:./api \
 		--go-errors_out=paths=source_relative:. \
 		--go-http_out=paths=source_relative:./api \
 		--go-grpc_out=paths=source_relative:./api \
-		--openapiv2_out=./api/docs \
-		--openapiv2_opt=logtostderr=true \
-		--openapiv2_opt=json_names_for_fields=false \
 		--openapi_out=fq_schema_naming=true,naming=proto,default_response=false:. \
 		$(API_PROTO_FILES)
 
@@ -65,8 +64,7 @@ run:
 -X main.GitHash=$(GITHASH) \
 -X main.Name=$(APPNAME) \
 -X main.Built=$(Built) \
-" \
-		./cmd/... --conf ./configs/ -v
+" ./cmd/... --conf ./configs/
 
 .PHONY: build
 # build
@@ -88,6 +86,11 @@ generate:
 	go mod tidy
 	go get github.com/google/wire/cmd/wire@latest
 	go generate ./...
+
+.PHONY: wire
+# wire generate wire file.
+wire:
+	@wire ./...
 
 .PHONY: all
 # generate all

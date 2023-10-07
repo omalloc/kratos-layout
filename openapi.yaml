@@ -32,8 +32,7 @@ paths:
                 - name: pagination.raw_total
                   in: query
                   schema:
-                    type: integer
-                    format: int64
+                    type: string
                 - name: name
                   in: query
                   schema:
@@ -70,16 +69,13 @@ components:
             type: object
             properties:
                 id:
-                    type: integer
-                    format: int64
+                    type: string
                 hello:
                     type: string
                 created_at:
-                    type: integer
-                    format: int64
+                    type: string
                 updated_at:
-                    type: integer
-                    format: int64
+                    type: string
         helloworld.v1.HelloListReply:
             type: object
             properties:
@@ -108,8 +104,7 @@ components:
                     type: integer
                     format: int32
                 raw_total:
-                    type: integer
-                    format: int64
+                    type: string
             description: 通用的分页信息
 tags:
     - name: Greeter

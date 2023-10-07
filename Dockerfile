@@ -1,17 +1,14 @@
-FROM golang:1.18 AS builder
+FROM golang:1.21 AS builder
 
 COPY . /src
 WORKDIR /src
 
 RUN GOPROXY=https://goproxy.cn make build
 
-FROM debian:stable-slim
+FROM alpine:3.14
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-		ca-certificates  \
-        netbase \
-        && rm -rf /var/lib/apt/lists/ \
-        && apt-get autoremove -y && apt-get autoclean -y
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
+     && apk add --no-cache tzdata curl
 
 COPY --from=builder /src/bin /app
 
@@ -21,4 +18,9 @@ EXPOSE 8000
 EXPOSE 9000
 VOLUME /data/conf
 
-CMD ["./server", "-conf", "/data/conf"]
+ENV TZ=Asia/Shanghai
+
+HEALTHCHECK --interval=5s --timeout=5s --start-period=3s --retries=3 \
+    CMD curl -sS 'http://127.0.0.1:8000/health' || exit 1
+
+CMD ["./server", "--conf", "/data/conf"]
